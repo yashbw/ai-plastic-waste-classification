@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Plastic Waste Classifier</title>
+    <style>
+      :root {
+        --bg-1: #edf8f4;
+        --bg-2: #e8f0ff;
+        --card: rgba(255, 255, 255, 0.88);
+        --card-solid: #ffffff;
+        --primary: #1cc18a;
+        --primary-dark: #118e67;
+        --accent: #1f5eff;
+        --text: #14312b;
+        --muted: #5d6f6a;
+        --line: rgba(20, 49, 43, 0.08);
+        --success: #26a269;
+        --warning: #ef8f3d;
+        --danger: #de5d5d;
+        --shadow: 0 22px 50px rgba(20, 49, 43, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+        color: var(--text);
+        transition: background 0.25s ease, color 0.25s ease;
+      }
+
+      .container {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 28px 18px 60px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        display: grid;
+        place-items: center;
+        color: white;
+        box-shadow: 0 8px 20px rgba(28, 193, 138, 0.35);
+        font-size: 1.2rem;
+      }
+
+      .nav-badge {
+        background: rgba(28, 193, 138, 0.12);
+        color: var(--primary-dark);
+        border: 1px solid rgba(28, 193, 138, 0.18);
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.4fr 0.6fr;
+        gap: 22px;
+        margin-bottom: 28px;
+      }
+
+      .hero-card,
+      .panel {
+        background: var(--card);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero-card {
+        padding: 28px 26px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(31, 94, 255, 0.08);
+        color: var(--accent);
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 8px 14px;
+        margin-bottom: 16px;
+        font-size: 0.8rem;
+      }
+
+      .hero h1 {
+        margin: 0 0 10px;
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        line-height: 1.12;
+      }
+
+      .hero p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.04rem;
+        line-height: 1.7;
+        max-width: 680px;
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .stat {
+        background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(240,248,245,0.9));
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+      }
+
+      .stat span {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .mini-panel {
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .mini-panel h3 {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+      }
+
+      .mini-panel ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .mini-panel li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 0.96rem;
+      }
+
+      .mini-panel .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        box-shadow: 0 0 0 4px rgba(28, 193, 138, 0.12);
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: 1.35fr 0.65fr;
+        gap: 22px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .camera-box {
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(244,251,247,0.94));
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 1.4rem;
+      }
+
+      .live-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(38, 162, 105, 0.08);
+        color: var(--success);
+        border: 1px solid rgba(38, 162, 105, 0.12);
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      .live-chip::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 0 4px rgba(38, 162, 105, 0.16);
+      }
+
+      .video-wrap {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #09221d, #14352c);
+        aspect-ratio: 16 / 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      video,
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .hidden { display: none !important; }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      button {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      button:hover { transform: translateY(-1px); }
+
+      .primary-btn {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        box-shadow: 0 10px 22px rgba(17, 142, 103, 0.24);
+      }
+
+      .secondary-btn {
+        background: rgba(31, 94, 255, 0.08);
+        color: var(--accent);
+      }
+
+      .danger-btn {
+        background: rgba(222, 93, 93, 0.08);
+        color: var(--danger);
+      }
+
+      .status {
+        margin-top: 16px;
+        min-height: 28px;
+        font-size: 0.96rem;
+        color: var(--muted);
+        background: rgba(20,49,43,0.02);
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+      }
+
+      .result-box {
+        background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(242,249,255,0.95));
+      }
+
+      .result-box h2 {
+        margin: 0 0 16px;
+        font-size: 1.55rem;
+      }
+
+      .badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border-radius: 999px;
+        padding: 10px 16px;
+        margin-bottom: 16px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .confidence {
+        font-size: clamp(1.9rem, 3vw, 2.7rem);
+        font-weight: 800;
+        margin: 0 0 8px;
+        color: var(--accent);
+      }
+
+      #labelText {
+        font-size: 1rem;
+        color: var(--muted);
+        margin-bottom: 16px;
+      }
+
+      .meta {
+        margin-top: 16px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+
+      .meta h3 {
+        margin: 0 0 10px;
+        font-size: 1.08rem;
+      }
+
+      .meta p {
+        margin: 0 0 10px;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+
+      .meta strong {
+        color: var(--text);
+      }
+
+      .lower-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 28px;
+      }
+
+      .feature {
+        background: rgba(255,255,255,0.8);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+      }
+
+      .feature .icon {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        font-size: 1.2rem;
+        background: rgba(28,193,138,0.1);
+        margin-bottom: 12px;
+      }
+
+      .feature h4 {
+        margin: 0 0 8px;
+        font-size: 1.05rem;
+      }
+
+      .feature p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      @media (max-width: 920px) {
+        .hero,
+        .workspace,
+        .lower-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .hero-card,
+        .panel {
+          padding: 18px;
+        }
+
+        .controls {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark">♻</div>
+          <span>Automatic Plastic Segregation and Classification System</span>
+        </div>
+        <div class="nav-badge">Project Presentation</div>
+      </div>
+
+      <header class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">AI + Computer Vision</div>
+          <h1>AI-Based Plastic Waste Classification</h1>
+          <p>
+            A responsive deep learning application for identifying plastic waste types from camera-captured or uploaded images,
+            helping users recognize materials such as PET, HDPE, LDPE, PP, PS, and other plastics.
+          </p>
+
+          <div class="hero-stats">
+            <div class="stat">
+              <strong>6</strong>
+              <span>Plastic classes</span>
+            </div>
+            <div class="stat">
+              <strong>MobileNetV2</strong>
+              <span>Deep model</span>
+            </div>
+            <div class="stat">
+              <strong>Realtime</strong>
+              <span>Web interface</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel mini-panel">
+          <h3>Project Highlights</h3>
+          <ul>
+            <li><span class="dot"></span> Camera-based image capture</li>
+            <li><span class="dot"></span> Upload and classify</li>
+            <li><span class="dot"></span> Recycling guidance</li>
+            <li><span class="dot"></span> Responsive web design</li>
+          </ul>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="panel camera-box">
+          <div class="section-head">
+            <h2>Live Camera Capture</h2>
+            <div class="live-chip">Ready</div>
+          </div>
+
+          <div class="video-wrap">
+            <video id="video" autoplay playsinline></video>
+            <img id="capturedImage" class="hidden" alt="Captured plastic item" />
+          </div>
+
+          <div class="controls">
+            <button type="button" class="primary-btn" id="startCameraBtn">Start Camera</button>
+            <button type="button" class="secondary-btn" id="captureBtn">Capture Photo</button>
+            <button type="button" class="secondary-btn" id="uploadBtn">Upload Image</button>
+            <input type="file" id="imageInput" accept="image/*" class="hidden" />
+            <button type="button" class="danger-btn" id="resetBtn">Reset</button>
+          </div>
+
+          <div id="status" class="status">Camera is ready for classification.</div>
+        </section>
+
+        <aside class="panel result-box">
+          <h2>Prediction Result</h2>
+          <div id="resultBadge" class="badge">Waiting for image</div>
+          <div id="confidence" class="confidence">0%</div>
+          <div id="labelText">No prediction yet</div>
+
+          <div class="meta">
+            <h3>Plastic Details</h3>
+            <p id="description">Capture or upload an image to identify the plastic category.</p>
+            <p><strong>Recycling:</strong> <span id="recycleText">--</span></p>
+            <p><strong>Tips:</strong> <span id="tipsText">--</span></p>
+          </div>
+        </aside>
+      </main>
+
+      <section class="lower-grid">
+        <div class="feature">
+          <div class="icon">📷</div>
+          <h4>Camera Input</h4>
+          <p>Use the device camera to capture the waste item in real time for instant recognition.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">🧠</div>
+          <h4>Deep Learning</h4>
+          <p>Transfer learning with MobileNetV2 is used to classify plastic material types efficiently.</p>
+        </div>
+        <div class="feature">
+          <div class="icon">🌍</div>
+          <h4>Eco Impact</h4>
+          <p>Promotes proper sorting and recycling practices to reduce plastic waste pollution.</p>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const video = document.getElementById('video');
+      const capturedImage = document.getElementById('capturedImage');
+      const status = document.getElementById('status');
+      const resultBadge = document.getElementById('resultBadge');
+      const confidence = document.getElementById('confidence');
+      const labelText = document.getElementById('labelText');
+      const description = document.getElementById('description');
+      const recycleText = document.getElementById('recycleText');
+      const tipsText = document.getElementById('tipsText');
+      const imageInput = document.getElementById('imageInput');
+      const startCameraBtn = document.getElementById('startCameraBtn');
+      const captureBtn = document.getElementById('captureBtn');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      let stream = null;
+
+      async function startCamera() {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' },
+            audio: false
+          });
+
+          video.srcObject = stream;
+          video.classList.remove('hidden');
+          capturedImage.classList.add('hidden');
+          status.textContent = 'Camera started. Point it at the plastic item and capture an image.';
+        } catch (error) {
+          status.textContent = 'Camera access was denied or unavailable. Please upload an image instead.';
+        }
+      }
+
+      function capturePhoto() {
+        if (!video.srcObject) {
+          status.textContent = 'Please start the camera first.';
+          return;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const data = canvas.toDataURL('image/jpeg');
+
+        capturedImage.src = data;
+        capturedImage.classList.remove('hidden');
+        video.classList.add('hidden');
+        status.textContent = 'Image captured. Sending it for classification...';
+        sendImageToServer(data);
+      }
+
+      function onFileSelected(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          capturedImage.src = e.target.result;
+          capturedImage.classList.remove('hidden');
+          video.classList.add('hidden');
+          status.textContent = 'Image uploaded. Classifying your plastic...';
+          sendImageToServer(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function resetView() {
+        capturedImage.classList.add('hidden');
+        video.classList.remove('hidden');
+
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+          stream = null;
+        }
+
+        video.srcObject = null;
+        status.textContent = 'Camera reset. Start again when you are ready.';
+        resultBadge.textContent = 'Waiting for image';
+        confidence.textContent = '0%';
+        labelText.textContent = 'No prediction yet';
+        description.textContent = 'Capture or upload an image to identify the plastic category.';
+        recycleText.textContent = '--';
+        tipsText.textContent = '--';
+      }
+
+      function sendImageToServer(dataUrl) {
+        const base64 = dataUrl.split(',')[1];
+        const byteCharacters = atob(base64);
+        const byteArray = new Uint8Array(byteCharacters.length);
+
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteArray[i] = byteCharacters.charCodeAt(i);
+        }
+
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        const formData = new FormData();
+        formData.append('image', blob, 'capture.jpg');
+
+        fetch('/predict', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (!data.success) {
+              status.textContent = data.message || 'Prediction failed.';
+              return;
+            }
+
+            resultBadge.textContent = data.label;
+            confidence.textContent = `${data.confidence}%`;
+            labelText.textContent = `Predicted Plastic: ${data.label}`;
+            description.textContent = data.metadata.description || 'No description available.';
+            recycleText.textContent = data.metadata.recycle || '--';
+            tipsText.textContent = data.metadata.tips || '--';
+            status.textContent = `${data.message} Confidence: ${data.confidence}%`;
+          })
+          .catch(() => {
+            status.textContent = 'Prediction error. Please try again.';
+          });
+      }
+
+      startCameraBtn.addEventListener('click', startCamera);
+      captureBtn.addEventListener('click', capturePhoto);
+      uploadBtn.addEventListener('click', () => imageInput.click());
+      imageInput.addEventListener('change', onFileSelected);
+      resetBtn.addEventListener('click', resetView);
+    </script>
+  </body>
+</html>
